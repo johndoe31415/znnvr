@@ -1,9 +1,9 @@
 {
 	"segment_length_secs": 900,
-	"target_directory": "/ext/joe/camera",
+	"target_directory": "/ext/joe/znnvr",
 	"cameras": [
 		{
-			"name": "Kamera",
+			"name": "My Camera",
 			"uri": "rtsp://view:supersecret@192.168.33.44:554/h265Preview_01_main"
 		}
 	]

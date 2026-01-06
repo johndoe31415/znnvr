@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
 import json
 import subprocess
 
@@ -27,6 +28,16 @@ class Systemd():
 	def status(cls):
 		proc = subprocess.run([ "systemctl", "--user", "-o", "json" ], check = True, capture_output = True)
 		return json.loads(proc.stdout)
+
+	@classmethod
+	def loginctl_show_my_user(cls):
+		proc = subprocess.run([ "loginctl", "show-user", os.environ["USER"] ], check = True, capture_output = True)
+		result = { }
+		for line in proc.stdout.decode("utf-8").split("\n"):
+			if "=" in line:
+				(key, value) = line.split("=", maxsplit = 1)
+				result[key] = value
+		return result
 
 	@classmethod
 	def escape(cls, cmd: list[str]):

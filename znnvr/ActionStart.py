@@ -20,6 +20,8 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import sys
+import subprocess
 from .ZnnvrAction import ZnnvrAction
 from .Configuration import Configuration
 from .Systemd import Systemd
@@ -30,9 +32,10 @@ class ActionStart(ZnnvrAction):
 		os.makedirs(target_dir, exist_ok = True)
 		systemd_unit_filename = os.path.expanduser(f"~/.local/share/systemd/user/{camera['systemd-rec-service']}")
 
-		cmd = [ "/usr/bin/ffmpeg", "-hide_banner", "-nostats" ]
-			#-stimeout 5000000 -rw_timeout 5000000 \
+		cmd = [ "/usr/bin/ffmpeg" ]
+		cmd += [ "-nostdin", "-hide_banner", "-nostats", "-loglevel", "warning" ]
 		cmd += [ "-rtsp_transport", "tcp" ]
+		cmd += [ "-timeout", str(round(self._config.stream_timeout_secs * 1000000)) ]
 		cmd += [ "-i", camera["uri"] ]
 		cmd += [ "-c", "copy" ]
 		cmd += [ "-f", "segment", "-segment_time", str(self._config.segment_time_secs) ]
@@ -54,9 +57,20 @@ class ActionStart(ZnnvrAction):
 			print("[Install]", file = f)
 			print("WantedBy=default.target", file = f)
 
+	def _validate_linger(self):
+		loginctl_args = Systemd.loginctl_show_my_user()
+		linger_state = loginctl_args.get("Linger")
+		if linger_state != "yes":
+			print(f"Warning: linger for user {os.environ['USER']} is set to \"{linger_state}\".", file = sys.stderr)
+			print("This may cause your recording jobs to be terminated by systemd.", file = sys.stderr)
+			print(f"To fix this, do as root: loginctl enable-linger {os.environ['USER']}", file = sys.stderr)
+
 	def run(self):
 		self._config = Configuration(self._args.config_file)
 		self._run_command([ "uninstall" ])
-		print(self._args)
+		self._validate_linger()
 		for camera in self._config.cameras:
 			self._install(camera)
+
+		for camera in self._config.cameras:
+			subprocess.run([ "systemctl", "--user", "start", camera["systemd-rec-service"] ], check = True)

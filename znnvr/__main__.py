@@ -29,7 +29,7 @@ def main(args: list[str] | None = None):
 	mc = MultiCommand(description = "znnvr: Zero Nonsense NVR")
 
 	def genparser(parser):
-		parser.add_argument("-c", "--config-file", metavar = "filename", default = "~/.config/znnvr_config.json", help = "Specifies the configuration file to use. Defaults to %(default)s.")
+		parser.add_argument("-c", "--config-file", metavar = "filename", default = "~/.config/znnvr.json", help = "Specifies the configuration file to use. Defaults to %(default)s.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be given multiple times.")
 	mc.register("start", "Install/update and start systemd units that ensure the camera streams are recorded", genparser, action = ActionStart)
 

@@ -59,3 +59,7 @@ class Configuration():
 	@property
 	def segment_time_secs(self):
 		return self._config.get("segment_time_secs", 900)
+
+	@property
+	def stream_timeout_secs(self):
+		return self._config.get("stream_timeout_secs", 10)
