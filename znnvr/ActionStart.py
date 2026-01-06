@@ -72,5 +72,6 @@ class ActionStart(ZnnvrAction):
 		for camera in self._config.cameras:
 			self._install(camera)
 
+		subprocess.run([ "systemctl", "--user", "daemon-reload" ], check = True)
 		for camera in self._config.cameras:
 			subprocess.run([ "systemctl", "--user", "start", camera["systemd-rec-service"] ], check = True)
