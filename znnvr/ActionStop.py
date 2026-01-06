@@ -30,4 +30,4 @@ class ActionStop(ZnnvrAction):
 		for unit in Systemd.status():
 			unit_name = unit["unit"]
 			if ZNNVR_SERVICE_REGEX.fullmatch(unit_name) is not None:
-				subprocess.run([ "systemd", "--user", "stop", unit_name ], check = False)
+				subprocess.run([ "systemctl", "--user", "stop", unit_name ], check = False)
